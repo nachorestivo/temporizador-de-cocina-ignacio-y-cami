@@ -1,1 +1,92 @@
+using System;
+using System.Windows.Forms;
 
+namespace TemporizadorDeCocinaAvanzado
+{
+    public partial class Form1 : Form
+    {
+        private int tiempoRestante; 
+        private bool enPausa = false; 
+
+        public Form1()
+        {
+            InitializeComponent();
+            
+            timer1.Interval = 1000; // Intervalo de 1 segundo
+            timer1.Tick += Timer1_Tick; // Evento cada vez que el timer "tickea"
+        }
+
+        
+        private void btnIniciar_Click(object sender, EventArgs e)
+        {
+            if (int.TryParse(txtMinutos.Text, out int minutos) && minutos > 0)
+            {
+                tiempoRestante = minutos * 60; 
+                ActualizarLabelTiempo();
+                timer1.Start(); 
+                btnIniciar.Enabled = false; // 
+                btnPausar.Enabled = true;  //
+                btnReiniciar.Enabled = true; // 
+            }
+            else
+            {
+                MessageBox.Show("Por favor ingresa un valor válido en minutos.");
+            }
+        }
+
+        
+        private void btnPausar_Click(object sender, EventArgs e)
+        {
+            if (enPausa)
+            {
+                // Reanudar
+                timer1.Start();
+                btnPausar.Text = "Pausar";
+                enPausa = false;
+            }
+            else
+            {
+                // Pausar
+                timer1.Stop();
+                btnPausar.Text = "Reanudar";
+                enPausa = true;
+            }
+        }
+
+        
+        private void btnReiniciar_Click(object sender, EventArgs e)
+        {
+            timer1.Stop();
+            btnPausar.Text = "Pausar";
+            enPausa = false;
+            btnIniciar.Enabled = true;
+            btnPausar.Enabled = false;
+            btnReiniciar.Enabled = false;
+            lblTiempo.Text = "Tiempo: 00:00"; // Mostrar tiempo inicial
+        }
+
+        
+        private void Timer1_Tick(object sender, EventArgs e)
+        {
+            if (tiempoRestante > 0)
+            {
+                tiempoRestante--;
+                ActualizarLabelTiempo();
+            }
+            else
+            {
+                timer1.Stop(); 
+                lblTiempo.Text = "¡Tiempo Finalizado!";
+                MessageBox.Show("¡El tiempo de cocción ha terminado!");
+            }
+        }
+
+        
+        private void ActualizarLabelTiempo()
+        {
+            int minutos = tiempoRestante / 60;
+            int segundos = tiempoRestante % 60;
+            lblTiempo.Text = $"Tiempo: {minutos:D2}:{segundos:D2}";
+        }
+    }
+}
